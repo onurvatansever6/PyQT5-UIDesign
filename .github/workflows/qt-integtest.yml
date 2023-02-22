@@ -1,0 +1,28 @@
+name: QT Integtest using Ubuntu-Latest
+on:
+  push:
+    branches:
+      - master
+jobs:
+  QT_Pytest:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v3
+      with:
+        python-version: 3.9
+    - name: Install dependencies for executing QT tests
+      run: |
+        sudo apt install libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xfixes0 x11-utils
+        /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1920x1200x24 -ac +extension GLX
+        python -m pip install --upgrade pip
+        pip install pyside2 pytest coverage pytest-qt pyqt5-tools
+    - name: Running pytest with Display Enviroment
+      env:
+        DISPLAY: ':99.0'
+        QT_DEBUG_PLUGINS: 1
+      run: |
+        ulimit -c unlimited
+        xvfb-run -a pytest -m integtest
