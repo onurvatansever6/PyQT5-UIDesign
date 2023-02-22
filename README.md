@@ -1,2 +1,1 @@
-# PyQT5-UIDesign
-UI Design with PyQT5
+# UI_Design
